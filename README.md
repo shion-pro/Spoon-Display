@@ -16,7 +16,7 @@
 
 #### 事前準備
 
-1. Spoon-Display, Spoon-Display-Extension, (Google Chrome)をダウンロード
+1. Spoon-Display, Spoon-Display-Extension(別レポジトリ), (Google Chrome)をダウンロード
 
 2. Chromeにて chrome://extensions/ にアクセス
 
