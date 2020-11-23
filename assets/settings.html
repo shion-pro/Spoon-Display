@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Spoon-Display Settings</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="./settings.css" />
+    </head>
+    <body>
+        <header>
+            <div class="main-title">Settings</div>
+        </header>
+        <main>
+            <div class="message-settings">
+                <div class="title">
+                    <p>Message</p>
+                </div>
+                <div>
+                    <div class="switch" id="settings-type-switch">
+                        <span class="settings-type-switch-span">Simple Settings</span>
+                        <label class="switch__label">
+                            <input type="checkbox" class="switch__input" id="settings-type-toggle" />
+                            <span class="switch__content"></span>
+                            <span class="switch__circle"></span>
+                        </label>
+                        <sapn class="settings-type-switch-span">Advanced Settings</sapn>
+                    </div>
+                </div>
+                <div class="sub-title">
+                    <p>Simple Settings</p>
+                </div>
+                <div class="simple-settings">
+                    <div class="simple-color">
+                        <div class="sub-sub-title">
+                            Color
+                        </div>
+                        <div class="description">
+                            文字カラーを変更します
+                        </div>
+                        <div class="sub-sub-sub-title">
+                            ランダム
+                        </div>
+                        <div class="simple-color-random">
+                            <div class="switch">
+                                <label class="switch__label">
+                                    <input type="checkbox" class="switch__input" id="random-color-toggle" />
+                                    <span class="switch__content"></span>
+                                    <span class="switch__circle"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="sub-sub-sub-title">
+                            固定
+                        </div>
+                        <div class="simple-color-fix">
+                            <div class="cp_iptxt">
+                                <label class="ef">
+                                <input type="text" placeholder="Spoon-Display" id="fix-color-input" class="color-picker" readonly>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="simple-font-size">
+                        <div class="sub-sub-title">
+                            Font Size
+                        </div>
+                        <div class="description">
+                            フォントサイズを変更します
+                        </div>
+                        <div class="sub-sub-sub-title">
+                            ランダム
+                        </div>
+                        <div class="simple-font-size-random">
+                            <div class="switch">
+                                <label class="switch__label">
+                                    <input type="checkbox" class="switch__input" id="random-font-size-toggle" />
+                                    <span class="switch__content"></span>
+                                    <span class="switch__circle"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="sub-sub-sub-title">
+                            固定
+                        </div>
+                        <div class="simple-font-size-fix">
+                            <div id="fix-font-size-value-container">
+                                <span id="fix-font-size-value">0</span>
+                            </div>
+                            <div class="slider-container">
+                                <input id="fix-font-size-slider" type="range" min="0" max="100" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-title">
+                    <p>Advanced Settings</p>
+                </div>
+                <div class="advanced-settings">
+                    <!-- ここに表を作る -->
+                    <!-- jsだけで全部完結しそうじゃね？ -->
+                    <div id="user-data-div">
+                        <div id="user-data-header">
+                            <!-- タイトル, サーチ, プラス -->
+                            <div id="user-data-title">
+                                <p>User Data</p>
+                            </div>
+                            <!-- <div id="user-data-search">
+                                <div class="cp_iptxt-table">
+                                    <label class="ef-table">
+                                    <div id="user-data-search-search-icon">
+                                        <img src="./pics/user-data-search-search-icon.png" alt="">
+                                    </div>
+                                    <input type="text" placeholder="Search" id="user-data-search-input">
+                                    <div id="user-data-search-delete-icon">
+                                        <img src="./pics/user-data-search-delete-icon.png" alt="">
+                                    </div>
+                                    </label>
+                                </div>
+                            </div> -->
+                            <div id="user-data-search">
+                                <p>Set the color and font-size for each user</p>
+                            </div>
+                            <div id="user-data-add-btn">
+                                <img src="./pics/user-data-add-icon.png" alt="">
+                            </div>
+                        </div>
+                        <div id="user-data-main">
+                            <table>
+                                <tr id="table-header">
+                                    <th class="table-action"><p>Actions</p></th>
+                                    <th class="table-name th-left"><p>Name</p></th>
+                                    <th class="table-color th-left"><p>Color</p></th>
+                                    <th class="table-font-size th-left"><p>Font Size</p></th>
+                                </tr>
+                                <tr id="data-row-1">
+                                    <td id="actions-1" class="table-action">
+                                        <div class="action-icons">
+                                            <div class="action-edit-icon-div">
+                                                <img src="./pics/user-data-main-edit-icon.png" id="table-edit-icon-1" alt="">
+                                            </div>
+                                            <div class="action-check-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-check-icon-1" alt="">
+                                            </div>
+                                            <div class="action-edicheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-edicheck-icon-1" alt="">
+                                            </div>
+                                            <div class="action-delcheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-delcheck-icon-1" alt="">
+                                            </div>
+                                            <div class="action-delete-icon-div">
+                                                <img src="./pics/user-data-main-delete-icon.png" id="table-delete-icon-1" alt="">
+                                            </div>
+                                            <div class="action-cancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-cancel-icon-1" alt="">
+                                            </div>
+                                            <div class="action-edicancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-edicancel-icon-1" alt="">
+                                            </div>
+                                            <div class="action-delcancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-delcancel-icon-1" alt="">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td id="name-1" class="table-name"><input type="text" readonly></td>
+                                    <td id="color-1" class="table-color"><input class="color-picker" type="text" readonly></td>
+                                    <td id="font-size-1" class="table-font-size"><input class="table-font-size-input" type="text" readonly></td>
+                                    <td id="index-1" class="index-hidden"></td>
+                                </tr>
+                                <tr id="data-row-2">
+                                    <td id="actions-2" class="table-action">
+                                        <div class="action-icons">
+                                            <div class="action-edit-icon-div">
+                                                <img src="./pics/user-data-main-edit-icon.png" id="table-edit-icon-2" alt="">
+                                            </div>
+                                            <div class="action-check-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-check-icon-2" alt="">
+                                            </div>
+                                            <div class="action-edicheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-edicheck-icon-2" alt="">
+                                            </div>
+                                            <div class="action-delcheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-delcheck-icon-2" alt="">
+                                            </div>
+                                            <div class="action-delete-icon-div">
+                                                <img src="./pics/user-data-main-delete-icon.png" id="table-delete-icon-2" alt="">
+                                            </div>
+                                            <div class="action-cancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-cancel-icon-2" alt="">
+                                            </div>
+                                            <div class="action-edicancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-edicancel-icon-2" alt="">
+                                            </div>
+                                            <div class="action-delcancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-delcancel-icon-2" alt="">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td id="name-2" class="table-name"><input type="text" readonly></td>
+                                    <td id="color-2" class="table-color"><input class="color-picker" type="text" readonly></td>
+                                    <td id="font-size-2" class="table-font-size"><input class="table-font-size-input" type="text" readonly></td>
+                                    <td id="index-2" class="index-hidden"></td>
+                                </tr>
+                                <tr id="data-row-3">
+                                    <td id="actions-3" class="table-action">
+                                        <div class="action-icons">
+                                            <div class="action-edit-icon-div">
+                                                <img src="./pics/user-data-main-edit-icon.png" id="table-edit-icon-3" alt="">
+                                            </div>
+                                            <div class="action-check-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-check-icon-3" alt="">
+                                            </div>
+                                            <div class="action-edicheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-edicheck-icon-3" alt="">
+                                            </div>
+                                            <div class="action-delcheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-delcheck-icon-3" alt="">
+                                            </div>
+                                            <div class="action-delete-icon-div">
+                                                <img src="./pics/user-data-main-delete-icon.png" id="table-delete-icon-3" alt="">
+                                            </div>
+                                            <div class="action-cancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-cancel-icon-3" alt="">
+                                            </div>
+                                            <div class="action-edicancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-edicancel-icon-3" alt="">
+                                            </div>
+                                            <div class="action-delcancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-delcancel-icon-3" alt="">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td id="name-3" class="table-name"><input type="text" readonly></td>
+                                    <td id="color-3" class="table-color"><input class="color-picker" type="text" readonly></td>
+                                    <td id="font-size-3" class="table-font-size"><input class="table-font-size-input" type="text" readonly></td>
+                                    <td id="index-3" class="index-hidden"></td>
+                                </tr>
+                                <tr id="data-row-4">
+                                    <td id="actions-4" class="table-action">
+                                        <div class="action-icons">
+                                            <div class="action-edit-icon-div">
+                                                <img src="./pics/user-data-main-edit-icon.png" id="table-edit-icon-4" alt="">
+                                            </div>
+                                            <div class="action-check-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-check-icon-4" alt="">
+                                            </div>
+                                            <div class="action-edicheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-edicheck-icon-4" alt="">
+                                            </div>
+                                            <div class="action-delcheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-delcheck-icon-4" alt="">
+                                            </div>
+                                            <div class="action-delete-icon-div">
+                                                <img src="./pics/user-data-main-delete-icon.png" id="table-delete-icon-4" alt="">
+                                            </div>
+                                            <div class="action-cancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-cancel-icon-4" alt="">
+                                            </div>
+                                            <div class="action-edicancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-edicancel-icon-4" alt="">
+                                            </div>
+                                            <div class="action-delcancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-delcancel-icon-4" alt="">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td id="name-4" class="table-name"><input type="text" readonly></td>
+                                    <td id="color-4" class="table-color"><input class="color-picker" type="text" readonly></td>
+                                    <td id="font-size-4" class="table-font-size"><input class="table-font-size-input" type="text" readonly></td>
+                                    <td id="index-4" class="index-hidden"></td>
+                                </tr>
+                                <tr id="data-row-5">
+                                    <td id="actions-5" class="table-action">
+                                        <div class="action-icons">
+                                            <div class="action-edit-icon-div">
+                                                <img src="./pics/user-data-main-edit-icon.png" id="table-edit-icon-5" alt="">
+                                            </div>
+                                            <div class="action-check-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-check-icon-5" alt="">
+                                            </div>
+                                            <div class="action-edicheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-edicheck-icon-5" alt="">
+                                            </div>
+                                            <div class="action-delcheck-icon-div">
+                                                <img src="./pics/user-data-main-check-icon.png" id="table-delcheck-icon-5" alt="">
+                                            </div>
+                                            <div class="action-delete-icon-div">
+                                                <img src="./pics/user-data-main-delete-icon.png" id="table-delete-icon-5" alt="">
+                                            </div>
+                                            <div class="action-cancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-cancel-icon-5" alt="">
+                                            </div>
+                                            <div class="action-edicancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-edicancel-icon-5" alt="">
+                                            </div>
+                                            <div class="action-delcancel-icon-div">
+                                                <img src="./pics/user-data-main-cancel-icon.png"  id="table-delcancel-icon-5" alt="">
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td id="name-5" class="table-name"><input type="text" readonly></td>
+                                    <td id="color-5" class="table-color"><input class="color-picker" type="text" readonly></td>
+                                    <td id="font-size-5" class="table-font-size"><input class="table-font-size-input" type="text" readonly></td>
+                                    <td id="index-5" class="index-hidden"></td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div id="user-data-footer">
+                            <div id="user-data-page-navigation">
+                                <div id="user-data-page-navigation-back-icon">
+                                    <img src="./pics/user-data-page-navigation-back-icon.png" alt="">
+                                </div>
+                                <p id="user-data-page-navigation-page-num">1 of n</p>
+                                <div id="user-data-page-navigation-front-icon">
+                                    <img src="./pics/user-data-page-navigation-front-icon.png" alt="">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="animation-settings">
+                <div class="title">
+                    <p>Animation</p>
+                </div>
+                <!-- max_layer, spoon, heart -->
+                <div class="heart-setting">
+                    <div class="sub-sub-title">
+                        Heart
+                    </div>
+                    <div class="description">
+                        ハート受け取り時の描画数を変更します
+                    </div>
+                    <div id="heart-value-container">
+                        <span id="heart-value">0</span>
+                    </div>
+                    <div class="slider-container">
+                        <input id="heart-slider" type="range" min="0" max="4" />
+                    </div>
+                </div>
+                <div class="present-setting">
+                    <div class="sub-sub-title">
+                        Present
+                    </div>
+                    <div class="description">
+                        Spoonやバスター受け取り時の描画数を設定します
+                    </div>
+                    <div id="present-value-container">
+                        <span id="present-value">0</span>
+                    </div>
+                    <div class="slider-container">
+                        <input id="present-slider" type="range" min="0" max="4" />
+                    </div>
+                </div>
+                <div class="max-layer-setting">
+                    <div class="sub-sub-title">
+                        Layer
+                    </div>
+                    <div class="description">
+                        その他アニメーションレイヤーの最大同時起動数を設定します
+                    </div>
+                    <div id="layer-value-container">
+                        <span id="layer-value">0</span>
+                    </div>
+                    <div class="slider-container">
+                        <input id="layer-slider" type="range" min="0" max="10" />
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                <div id="close-btns">
+                    <button id="close-without-change-btn">
+                        変更せずに閉じる
+                    </button>
+                    <button id="close-with-change-btn">
+                        変更を反映する
+                    </button>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <div class="color-popup" id="color-popup">
+                <div class="color-popup-inner">
+                    <md-color-picker id="colorPicker" color-margin="6" colors-per-row="5" color-size="40" default-tint="500" palette="material-full" use-spectrum-picker="true" value="#2196f3"></md-color-picker>
+                    <div class="cp_iptxt">
+                        <label class="ef">
+                        <input type="text" placeholder="Spoon-Display" class="color-sample" readonly>
+                        </label>
+                    </div>
+                    <div id="color-modal-btns">
+                        <button class="color-modal-cancel-btn">Cancel</button>
+                        <button class="color-modal-ok-btn">OK</button>
+                    </div>
+                </div>
+                <div class="color-black-background"></div>
+            </div>
+            <div class="font-size-popup" id="font-size-popup">
+                <div class="font-size-popup-inner">
+                    <div id="font-size-modal-slider">
+                        <div id="table-font-size-value-container">
+                            <span id="table-font-size-value">0</span>
+                        </div>
+                        <div class="slider-container">
+                            <input id="table-font-size-slider" type="range" min="0" max="100" />
+                        </div>
+                    </div>
+                    <div id="font-size-modal-btns">
+                        <button class="font-size-modal-cancel-btn">Cancel</button>
+                        <button class="font-size-modal-ok-btn">OK</button>
+                    </div>
+                </div>
+                <div class="font-size-black-background"></div>
+            </div>
+            <div class="close-with-change-popup" id="close-with-change-popup">
+                <div class="close-with-change-popup-inner">
+                    <p>
+                        変更を保存しますか？
+                        (再起動されます)
+                    </p>
+                    <div id="close-with-change-modal-close-btns">
+                        <button class="close-with-change-no-modal-close-btn">No</button>
+                        <button class="close-with-change-yes-modal-close-btn">Yes</button>
+                    </div>
+                </div>
+                <div class="close-with-change-black-background"></div>
+            </div>
+            <div class="close-without-change-popup" id="close-without-change-popup">
+                <div class="close-without-change-popup-inner">
+                    <p>
+                        変更を反映せずに終了しますか？
+                    </p>
+                    <div id="close-without-change-modal-close-btns">
+                        <button class="close-without-change-no-modal-close-btn">No</button>
+                        <button class="close-without-change-yes-modal-close-btn">Yes</button>
+                    </div>
+                </div>
+                <div class="close-without-change-black-background"></div>
+            </div>
+        </footer>
+        <script type="text/javascript" src="./scripts/settings.js"></script>
+        <script src="./scripts/md-color-picker.js"></script>
+    </body>
+</html>
