@@ -1106,7 +1106,11 @@ function closeWithChange() {
     } else {
         // pass
     }
-    SD_settings.max_layer = max_layer;
+    if (max_layer === "オフ") {
+        SD_settings.max_layer = "0";
+    } else {
+        SD_settings.max_layer = max_layer;
+    }
     SD_settings.send_heart_message = String(send_heart_message);
     SD_settings.send_spoon_message = String(send_spoon_message);
     SD_settings.send_buster_message = String(send_buster_message);
