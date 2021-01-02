@@ -6,25 +6,25 @@ edir = remote.app.getAppPath();
 Store = require("electron-store");
 fs = require("fs");
 nicoJS = require('nicoJS');
+make_json_file = require(`${edir}\\make_json_file.js`);
 $ = jQuery = require(`${edir}\\jquery\\jquery-3.5.1.min.js`);
-nico_settings_path = `${edir}\\nico_settings.json`;
+SD_settings_path = `${edir}\\SD_settings.json`;
 
 try {
-    nico_settings = JSON.parse(fs.readFileSync(nico_settings_path, 'utf8'));
+    SD_settings = JSON.parse(fs.readFileSync(SD_settings_path, 'utf8'));
 } catch(error) {
-    make_json = {"settings_type":"simple","color":"#ffffff","random_color":"true","font_size":"50","random_font_size":"true","speed":"1","speak":"false","show_image":"false","bot_url":"http://localhost:5569","heart_num":"2","present_num":"2","max_layer":"1","now_layer":"0","authors_list":{}}
-    fs.writeFileSync(nico_settings_path, JSON.stringify(make_json));
-    nico_settings = JSON.parse(fs.readFileSync(nico_settings_path, 'utf8'));
+    make_json_file.SD_settings(SD_settings_path);
 }
-if (nico_settings.heart_num === "0") {
+
+if (SD_settings.heart_num === "0") {
     json_heart_num = 0;
-} else if (nico_settings.heart_num === "1") {
+} else if (SD_settings.heart_num === "1") {
     json_heart_num = 50;
-} else if (nico_settings.heart_num === "2") {
+} else if (SD_settings.heart_num === "2") {
     json_heart_num = 100;
-} else if (nico_settings.heart_num === "3") {
+} else if (SD_settings.heart_num === "3") {
     json_heart_num = 150;
-} else if (nico_settings.heart_num === "4") {
+} else if (SD_settings.heart_num === "4") {
     json_heart_num = 200;
 } else {
     json_heart_num = 0;

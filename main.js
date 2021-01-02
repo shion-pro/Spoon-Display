@@ -1,24 +1,50 @@
 express = require('express');
 express_app = express();
+net = require('net');
 electron = require('electron');
 fs = require('fs');
+make_json_file = require('.\\make_json_file.js');
 BrowserWindow = electron.BrowserWindow;
 app = electron.app;
 Menu = electron.Menu;
 Tray = electron.Tray;
 nativeImage = electron.nativeImage;
+edir = app.getAppPath();
 ipcMain = electron.ipcMain;
 
 // ========== CRX ==========
-
+// 
 // ====================
 
 // ========== mainWindow ==========
-// b u nico_settings
+// 
 // ====================
 
 // ========== Settings ==========
-// send-message(next ver.)
+// 
+// ====================
+
+// ========== Comments ==========
+// 
+// ====================
+
+// ========== Updated ==========
+// mainWindow起動前にメッセージを受信した際生じるエラーを修復
+// splash screenの挙動を変更(未だ単なる飾り。今後読み込み短縮を行う)
+// send_message機能(ハート、スプーン受け取り時とか)
+// コメントゲットをchange感知に(取逃し防止)
+// make_jsonを他ファイル関数に変更(main, index, settings)
+// msg.authorが枠主じゃないときのみ送信(どうやって自分とるん(それかメッセージの一部とってやる)) <=
+// 5569占領時は起動しないように(メッセージはまだ)
+// 設定変更時の再起動を不要に
+// コメントWindow(半透明)
+// messageの文字数制限つけたい(アイフォンで確認)
+// speed変更可能
+// ====================
+
+// ========== Bugs ==========
+// cmdがフォント変わった(npm startの所為だからパッケージングしたら関係ない)
+// CRXがエラー吐く(XHRエラーだからどうしようもない)
 // ====================
 
 // ========== Config ==========
@@ -27,41 +53,90 @@ ipcMain = electron.ipcMain;
 splashURL = `${__dirname}\\assets\\splash.html`;
 mainURL = `${__dirname}\\assets\\index.html`;
 settingsURL = `${__dirname}\\assets\\settings.html`;
+commentsURL = `${__dirname}\\assets\\comments.html`;
 paperURL = `${__dirname}\\assets\\precipitate_paper\\index.html`;
 heartURL = `${__dirname}\\assets\\precipitate_heart\\index.html`;
 splashWindow = null;
 mainWindow = null;
 settingsWindow = null;
+commentsWindow = null;
 tray = null;
 
 // init now_layer
 try {
-    nico_settings = JSON.parse(fs.readFileSync('.\\nico_settings.json', 'utf8'));
-    nico_settings.now_layer = "0";
-    fs.writeFileSync('.\\nico_settings.json', JSON.stringify(nico_settings));
+    SD_settings = JSON.parse(fs.readFileSync(`${edir}\\SD_settings.json`, 'utf8'));
+    SD_settings.now_layer = "0";
+    fs.writeFileSync(`${edir}\\SD_settings.json`, JSON.stringify(SD_settings));
 } catch(error) {
-    make_json = {"settings_type":"simple","color":"#ffffff","random_color":"true","font_size":"50","random_font_size":"true","speed":"1","speak":"false","show_image":"false","bot_url":"http://localhost:5569","heart_num":"2","present_num":"2","max_layer":"1","now_layer":"0","authors_list":[]}
-    fs.writeFileSync('.\\nico_settings.json', JSON.stringify(make_json));
+    make_json_file.SD_settings(`${edir}\\SD_settings.json`);
+}
+
+// init messages_log
+try {
+    messages_log = JSON.parse(fs.readFileSync(`${edir}\\messages_log.json`, 'utf8'));
+    messages_log.messages = [];
+    fs.writeFileSync(`${edir}\\messages_log.json`, JSON.stringify(messages_log));
+} catch(error) {
+    fs.writeFileSync(`${edir}\\messages_log.json`, JSON.stringify({"messages":[]}));
+}
+
+// ====================
+
+// ========== func ==========
+
+function returnMessage(msg) {
+    SD_settings = JSON.parse(fs.readFileSync(`${edir}\\SD_settings.json`, 'utf8'));
+    return_message = null;
+    if (msg.type == "like" && SD_settings.send_heart_message == "true") {
+        return_message = SD_settings.heart_message;
+    } else if (msg.type == "present") {
+        if (msg.content.indexOf("Spoon") != -1 && SD_settings.send_spoon_message == "true") {
+            return_message = SD_settings.spoon_message;
+        } else if (msg.content.indexOf("Spoon") == -1 && SD_settings.send_buster_message == "true") {
+            return_message = SD_settings.buster_message;
+        }
+    }
+    // replace author name
+    if (return_message != null) {
+        if (msg.author.length >= 20) {
+            return_message = return_message.replace("(a_n)", msg.author.slice(0, 19));    
+        } else {
+            return_message = return_message.replace("(a_n)", msg.author);
+        }
+        sio.emit("returnMessage", return_message);
+    }
+}
+
+function logMessages(msg) {
+    messages_log = JSON.parse(fs.readFileSync(`${edir}\\messages_log.json`, 'utf8'));
+    author_exist = false;
+    messages_log.messages.push(msg);
+    fs.writeFileSync(`${edir}\\messages_log.json`, JSON.stringify(messages_log));
 }
 
 // ====================
 
 // ========== ipc ==========
+ipcMain.on("close-splash", (event, TRUE) => {
+    createWindow();
+});
+
 ipcMain.on("close-settings-with-change", (event, TRUE) => {
-    app.relaunch();
-    app.exit(0);
+    // app.relaunch();
+    // app.exit(0);
+    settingsWindow?.close();
 });
 
 ipcMain.on("close-settings-without-change", (event, TRUE) => {
     settingsWindow?.close();
 });
 
-ipcMain.on("pericipitate-paper", (event, spoonNum) => {
+ipcMain.on("pericipitate-paper", (event) => {
     size = electron.screen.getPrimaryDisplay().size;
-    nico_settings = JSON.parse(fs.readFileSync('.\\nico_settings.json', 'utf8'));
-    if (parseInt(nico_settings.now_layer) < parseInt(nico_settings.max_layer)) {
-        nico_settings.now_layer = String(parseInt(nico_settings.now_layer) + 1);
-        fs.writeFileSync('.\\nico_settings.json', JSON.stringify(nico_settings));
+    SD_settings = JSON.parse(fs.readFileSync(`${edir}\\SD_settings.json`, 'utf8'));
+    if (parseInt(SD_settings.now_layer) < parseInt(SD_settings.max_layer)) {
+        SD_settings.now_layer = String(parseInt(SD_settings.now_layer) + 1);
+        fs.writeFileSync(`${edir}\\SD_settings.json`, JSON.stringify(SD_settings));
         var paperWindow = new BrowserWindow({
             x: 0,
             y: 0,
@@ -85,19 +160,19 @@ ipcMain.on("pericipitate-paper", (event, spoonNum) => {
         // paperWindow.webContents.openDevTools();
         paperWindow.on('closed', function () {
             paperWindow = null;
-            nico_settings = JSON.parse(fs.readFileSync('.\\nico_settings.json', 'utf8'));
-            nico_settings.now_layer = String(parseInt(nico_settings.now_layer) - 1);
-            fs.writeFileSync('.\\nico_settings.json', JSON.stringify(nico_settings));
+            SD_settings = JSON.parse(fs.readFileSync(`${edir}\\SD_settings.json`, 'utf8'));
+            SD_settings.now_layer = String(parseInt(SD_settings.now_layer) - 1);
+            fs.writeFileSync(`${edir}\\SD_settings.json`, JSON.stringify(SD_settings));
         });
     }
 })
 
-ipcMain.on("pericipitate-heart", (event, spoonNum) => {
+ipcMain.on("pericipitate-heart", (event) => {
     size = electron.screen.getPrimaryDisplay().size;
-    nico_settings = JSON.parse(fs.readFileSync('.\\nico_settings.json', 'utf8'));
-    if (parseInt(nico_settings.now_layer) < parseInt(nico_settings.max_layer)) {
-        nico_settings.now_layer = String(parseInt(nico_settings.now_layer) + 1);
-        fs.writeFileSync('.\\nico_settings.json', JSON.stringify(nico_settings));
+    SD_settings = JSON.parse(fs.readFileSync(`${edir}\\SD_settings.json`, 'utf8'));
+    if (parseInt(SD_settings.now_layer) < parseInt(SD_settings.max_layer)) {
+        SD_settings.now_layer = String(parseInt(SD_settings.now_layer) + 1);
+        fs.writeFileSync(`${edir}\\SD_settings.json`, JSON.stringify(SD_settings));
         var heartWindow = new BrowserWindow({
             x: 0,
             y: 0,
@@ -121,9 +196,9 @@ ipcMain.on("pericipitate-heart", (event, spoonNum) => {
         // heartWindow.webContents.openDevTools();
         heartWindow.on('closed', function () {
             heartWindow = null;
-            nico_settings = JSON.parse(fs.readFileSync('.\\nico_settings.json', 'utf8'));
-            nico_settings.now_layer = String(parseInt(nico_settings.now_layer) - 1);
-            fs.writeFileSync('.\\nico_settings.json', JSON.stringify(nico_settings));
+            SD_settings = JSON.parse(fs.readFileSync(`${edir}\\SD_settings.json`, 'utf8'));
+            SD_settings.now_layer = String(parseInt(SD_settings.now_layer) - 1);
+            fs.writeFileSync(`${edir}\\SD_settings.json`, JSON.stringify(SD_settings));
         });
     }
 })
@@ -155,18 +230,12 @@ function createSplash() {
         splashWindow.loadURL(splashURL);
         // for debug
         // splashWindow.webContents.openDevTools();
-        splashWindow.on('closed', () => {
-            settingsWindow = null;
-            mainWindow = null;
-        });
-    }
-    setTimeout(createWindow, 1000);
-}
+    };
+};
 
 function createWindow() {
     if (splashWindow != null) {
         splashWindow.hide();
-        splashWindow = null;
     }
     if (mainWindow === null) {
         size = electron.screen.getPrimaryDisplay().size;
@@ -174,10 +243,12 @@ function createWindow() {
             x: 0,
             y: 0,
             width: size.width,
-            height: Math.round(size.height*0.95),
+            height: size.height,
             frame: false,
             transparent: true,
+            // transparent: false,
             alwaysOnTop: true,
+            // alwaysOnTop: false,
             resizable: true,
             hasShadow: false,
             skipTaskbar: true,
@@ -217,7 +288,38 @@ function createWindow() {
         settingsWindow.on('closed', () => {
             settingsWindow = null;
         });
-    }
+    };
+    if (commentsWindow === null) {
+        size = electron.screen.getPrimaryDisplay().size;
+        commentsWindow = new BrowserWindow({
+            opacity: 0.7, // set opacity
+            width: 500,
+            height: 350,
+            x: size.width - 500,
+            y: electron.screen.getPrimaryDisplay().bounds.height - 380,
+            frame: false,
+            transparent: true,
+            alwaysOnTop: true,
+            resizable: true,
+            show: false,
+            webPreferences: {
+                nodeIntegration: true,
+                enableRemoteModule: true
+            },
+            icon: `${__dirname}\\config\\icons\\show.png`,
+        });
+        commentsWindow.setMenu(null);
+        commentsWindow.loadURL(commentsURL);
+        // for debug
+        // commentsWindow.webContents.openDevTools();
+        commentsWindow.on('closed', () => {
+            commentsWindow = null;
+        });
+    };
+    if (splashWindow != null) {
+        splashWindow?.close();
+        splashWindow = null;
+    };
 };
 
 // before display main window, splash
@@ -243,6 +345,16 @@ app.whenReady().then(() => {
         click: function () {
           mainWindow?.hide();
           tray.setImage(`${__dirname}\\config\\icons\\hide.png`);
+        },
+      },
+      {
+        label: 'Comments',
+        click: function () {
+          if (commentsWindow === null) {
+            createWindow();
+          }
+          commentsWindow?.show();
+          commentsWindow?.focus();
         },
       },
       {
@@ -275,6 +387,7 @@ app.whenReady().then(() => {
     tray.setToolTip(app.getName());
     tray.setContextMenu(contextMenu);
 });
+
 // quit 
 app.on('window-all-closed', () => {
     app.quit();
@@ -289,6 +402,7 @@ app.on('activate', () => {
 
 
 // ========== Server PRT 5569 ==========
+
 // allow CORS
 express_app.use(function(req, res, next) {
       res.header("Access-Control-Allow-Origin", "https://www.spooncast.net"); // allow cors from spoon-port
@@ -296,22 +410,62 @@ express_app.use(function(req, res, next) {
       res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept"); // :<
       next(); // :<
 });
-// var server = express_app.listen(5569);
-sio = require("socket.io")(express_app.listen(5569), {'transports': ['websocket', 'polling']}, { // socket.io connect with express server
-    cors: {
-        origin: "https://www.spooncast.net", // allow cors(express need?)
-        methods: ["GET", "POST"], // php?
-        // allowedHeaders: ["my-custom-header"], // :<
-        credentials: true // :<
+function connectingSocket() {
+    sio.emit("returnMessage", "connecting");
+    setTimeout(function () {
+        connectingSocket();
+    }, 1000);
+}
+// build 5569
+function buildServer() {
+    sio = require("socket.io")(express_app.listen(5569), {'transports':['websocket', 'polling']}, { // socket.io connect with express server
+        cors: {
+            origin: "https://www.spooncast.net", // allow cors(express need?)
+            methods: ["GET", "POST"], // php?
+            // allowedHeaders: ["my-custom-header"], // :<
+            credentials: true // :<
+        }
+    });
+    sio.on("connection", function(socket) { // when connect to crx
+        console.log("connected");
+        connectingSocket();
+        socket.on('chat', function(msg){ // when get message from crx
+            if (msg == "connecting") {
+                console.log("connecting...");
+            } else {
+                console.log(msg);
+                // send to mainWindow
+                try {
+                    mainWindow.webContents.send('message', msg);
+                    commentsWindow.webContents.send('message', msg);
+                } catch {
+                    // error occur when splash screen is on top
+                }
+                if (msg.type == "like" || msg.type == "present") {
+                    returnMessage(msg);
+                }
+                logMessages(msg);
+            }
+        });
+    })
+}
+
+// check if port is busy
+test_server = net.createServer();
+test_server.once('error', function(err) {
+    if (err.code === 'EADDRINUSE') {
+        // port is currently in use
+        mainWindow?.close();
+        settingsWindow?.close();
+        app.exit(0);
     }
 });
-
-sio.on("connection", function(socket) { // when connect to crx
-    console.log("connected");
-    socket.on('chat', function(msg){ // when get message from crx
-        console.log(msg);
-        // send to mainWindow
-        mainWindow.webContents.send('message', msg);
-    });
-})
-// ====================
+test_server.once('listening', function() {
+  // close the server if listening doesn't fail
+  test_server.close();
+});
+test_server.once('close',function() {
+    // when server is not busy => buildServer
+    buildServer()
+});
+test_server.listen(5569);
