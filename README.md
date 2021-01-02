@@ -60,15 +60,13 @@
 
 3. 右上:"デベロッパーモード"をオンにする
 
-4. crxファイルをchrome上にドラッグ&ドロップ
-
-5. "拡張機能を追加"をクリック
+4. "パッケージ化されていない拡張機能を読み込む"からSpoon-Display-Extensionフォルダを選択
 
 ### 配信時
 
-1. Chromeで https://www.spooncast.net/jp/live にアクセスし、自分の配信に入室
+1. Google Chromeで https://www.spooncast.net/jp/live から自身のIDで検索し配信に入室
 
-2. 先ほどダウンロードしたSpoon-Displayフォルダ下にある Spoon-Display.exe を実行
+2. ダウンロードしたSpoon-Displayフォルダ下にある Spoon-Display.exe を実行(またはnode)
 
 ## 主な機能
 
