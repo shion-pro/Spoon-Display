@@ -39,9 +39,6 @@ var project;
                         outofWindow_num += 1;
                         paper.y -= _this.myCanvas.height*1000 - paper.size;
                         if (outofWindow_num >= paper_num) {
-                          const settings_paper = JSON.parse(fs.readFileSync(`${dir}/nico_settings.json`, 'utf8'));
-                          // settings_paper.now_layer = String(Number(settings_paper.now_layer) - 1);
-                          fs.writeFileSync(`${dir}\\nico_settings.json`, JSON.stringify(settings_paper));
                           w.close();
                       };
                     };
