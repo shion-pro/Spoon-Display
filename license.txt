@@ -1,0 +1,6 @@
+当ソフトウェア、並びにOpenJTalkのご利用は利用者の責任において行ってください。
+当ソフトウェア、並びにOpenJTalkの作成者は当ソフトウェアも使用により生じた損害に対する責任を負いません。
+当ソフトウェアの著作権は作成者に帰属します。
+
+OpenJTalk: http://open-jtalk.sourceforge.net/
+BSD license: https://opensource.org/
