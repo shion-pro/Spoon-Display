@@ -1,5 +1,3 @@
-const { unwatchFile } = require("fs");
-
 electron = require("electron");
 remote = electron.remote;
 econsole = remote.require("console");
@@ -10,7 +8,6 @@ fs = require("fs");
 make_json_file = require(`${edir}\\make_json_file.js`);
 // $ = jQuery = require(`${edir}\\jquery\\jquery-3.5.1.min.js`);
 SD_settings_path = `${edir}\\SD_settings.json`;
-
 
 try {
     SD_settings = JSON.parse(fs.readFileSync(SD_settings_path, 'utf8'));
@@ -70,6 +67,13 @@ if (SD_settings.send_buster_message === "false") {
 } else {
     buster_message_toggle = true;
     $("#buster-message-toggle").prop('checked', true);
+}
+// Add
+if (SD_settings.speech === "false") {
+    speech_toggle = false;
+} else {
+    speech_toggle = true;
+    $("#speech-toggle").prop('checked', true);
 }
 
 $('#settings-type-toggle').change(function() {
@@ -141,6 +145,14 @@ $('#buster-message-toggle').change(function() {
     } else {
         buster_message_toggle = false;
         $("#buster-message-container").addClass("blur");
+    }
+});
+
+$('#speech-toggle').change(function() {
+    if (speech_toggle === false) {
+        speech_toggle = true;
+    } else {
+        speech_toggle = false;
     }
 });
 
@@ -1042,6 +1054,7 @@ function closeWithChange() {
     heart_message = $("#heart-message-textarea").val();
     spoon_message = $("#spoon-message-textarea").val();
     buster_message = $("#buster-message-textarea").val();
+    speechUse = speech_toggle;
     // authors_list
     authors_list_new = [];
     author_index = 1;
@@ -1106,10 +1119,15 @@ function closeWithChange() {
     } else {
         // pass
     }
-    SD_settings.max_layer = max_layer;
+    if (max_layer === "オフ") {
+        SD_settings.max_layer = "0";
+    } else {
+        SD_settings.max_layer = max_layer;
+    }
     SD_settings.send_heart_message = String(send_heart_message);
-    SD_settings.send_spoon_message = String(send_spoon_message);
+    SD_settings.send_spoon_message = String(send_spoon_message);        
     SD_settings.send_buster_message = String(send_buster_message);
+    SD_settings.speech = String(speechUse);
     SD_settings.heart_message = heart_message;
     SD_settings.spoon_message = spoon_message;
     SD_settings.buster_message = buster_message;

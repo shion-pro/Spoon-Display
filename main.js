@@ -3,6 +3,10 @@ express_app = express();
 net = require('net');
 electron = require('electron');
 fs = require('fs');
+const { execSync } = require("child_process");
+// const { SD_settings } = require('.\\make_json_file.js');
+iconv = require("iconv-lite");
+sound = require('sound-play')
 make_json_file = require('.\\make_json_file.js');
 BrowserWindow = electron.BrowserWindow;
 app = electron.app;
@@ -50,12 +54,12 @@ ipcMain = electron.ipcMain;
 // ========== Config ==========
 
 // set URL, Window
-splashURL = `${__dirname}\\assets\\splash.html`;
-mainURL = `${__dirname}\\assets\\index.html`;
-settingsURL = `${__dirname}\\assets\\settings.html`;
-commentsURL = `${__dirname}\\assets\\comments.html`;
-paperURL = `${__dirname}\\assets\\precipitate_paper\\index.html`;
-heartURL = `${__dirname}\\assets\\precipitate_heart\\index.html`;
+splashURL = `${edir}\\assets\\splash.html`;
+mainURL = `${edir}\\assets\\index.html`;
+settingsURL = `${edir}\\assets\\settings.html`;
+commentsURL = `${edir}\\assets\\comments.html`;
+paperURL = `${edir}\\assets\\precipitate_paper\\index.html`;
+heartURL = `${edir}\\assets\\precipitate_heart\\index.html`;
 splashWindow = null;
 mainWindow = null;
 settingsWindow = null;
@@ -224,7 +228,7 @@ function createSplash() {
                 nodeIntegration: true,
                 enableRemoteModule: true
             },
-            icon: `${__dirname}\\config\\icons\\show.png`,
+            icon: `${edir}\\config\\icons\\show.png`,
         });
         splashWindow.setIgnoreMouseEvents(true);
         splashWindow.loadURL(splashURL);
@@ -257,7 +261,7 @@ function createWindow() {
                 nodeIntegration: true,
                 enableRemoteModule: true
             },
-            icon: `${__dirname}\\config\\icons\\show.png`,
+            icon: `${edir}\\config\\icons\\show.png`,
         });
         mainWindow.setIgnoreMouseEvents(true);
         mainWindow.loadURL(mainURL);
@@ -279,7 +283,7 @@ function createWindow() {
                 nodeIntegration: true,
                 enableRemoteModule: true
             },
-            icon: `${__dirname}\\config\\icons\\show.png`,
+            icon: `${edir}\\config\\icons\\show.png`,
         });
         settingsWindow.setMenu(null);
         settingsWindow.loadURL(settingsURL);
@@ -306,7 +310,7 @@ function createWindow() {
                 nodeIntegration: true,
                 enableRemoteModule: true
             },
-            icon: `${__dirname}\\config\\icons\\show.png`,
+            icon: `${edir}\\config\\icons\\show.png`,
         });
         commentsWindow.setMenu(null);
         commentsWindow.loadURL(commentsURL);
@@ -326,7 +330,7 @@ function createWindow() {
 app.on('ready', createSplash);
 app.whenReady().then(() => {
     tray = Tray(
-      nativeImage.createFromPath(`${__dirname}\\config\\icons\\show.png`)
+      nativeImage.createFromPath(`${edir}\\config\\icons\\show.png`)
     );
     const contextMenu = Menu.buildFromTemplate([
       {
@@ -337,14 +341,14 @@ app.whenReady().then(() => {
           }
           mainWindow?.show();
           mainWindow?.focus();
-          tray.setImage(`${__dirname}\\config\\icons\\show.png`);
+          tray.setImage(`${edir}\\config\\icons\\show.png`);
         },
       },
       {
         label: 'Hide',
         click: function () {
           mainWindow?.hide();
-          tray.setImage(`${__dirname}\\config\\icons\\hide.png`);
+          tray.setImage(`${edir}\\config\\icons\\hide.png`);
         },
       },
       {
@@ -400,8 +404,44 @@ app.on('activate', () => {
     }
 });
 
+// ========== Speech ==========
+function speechText(msg) {
+    useSpeech = JSON.parse(fs.readFileSync(`${edir}\\SD_settings.json`, 'utf8')).speech;
+    if (useSpeech == "true") {
+        input = ""
+        if (msg.type == "message" || msg.type == "combo") {
+            input = msg.content
+        } else if (msg.type == "enter") {
+            input = "こんにちは。" + msg.author + "さん";
+        } else {
+            // pass
+        }
+        if (input != "") {
+            // Generate input.txt
+            inputPath = `${edir}\\jtalk\\input.txt`;
+            wavPath = `${edir}\\jtalk\\speech.wav`;
+            exePath = `${edir}\\jtalk\\bin\\open_jtalk.exe`;
+            dicPath = `${edir}\\jtalk\\dic`;
+            htsvoicePath = `${edir}\\jtalk\\bin\\mei_normal.htsvoice`;
+            fs.writeFileSync(inputPath, "");
+            var fd = fs.openSync(inputPath, "w");
+            var buf = iconv.encode(input, "Shift_JIS");
+            fs.write(fd, buf, 0, buf.length, function(err, written, buffer) {
+            if(err) throw err;
+            // pass
+            });
+            // Generate wav
+            const cmd = `${exePath} -x ${dicPath} -m ${htsvoicePath} -r 1.0 -ow ${wavPath} ${inputPath}`;
+            const stdout = execSync(cmd);
+            // Play wav
+            sound.play(wavPath);
+        }
+    }
+};
 
-// ========== Server PRT 5569 ==========
+// speechText({type: "enter", author: "詩音", content:"こんにちは、詩音"});
+
+// ========== Server PORT 5569 ==========
 
 // allow CORS
 express_app.use(function(req, res, next) {
@@ -438,6 +478,12 @@ function buildServer() {
                 try {
                     mainWindow.webContents.send('message', msg);
                     commentsWindow.webContents.send('message', msg);
+                    try {
+                        speechText(msg);
+                    } catch (error) {
+                        // pass
+                        // print(error);
+                    }
                 } catch {
                     // error occur when splash screen is on top
                 }
